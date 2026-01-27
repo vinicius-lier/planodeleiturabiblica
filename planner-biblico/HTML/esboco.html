@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esboço</title>
+  <link rel="stylesheet" href="../css/app.css" />
+</head>
+
+<body>
+  <!-- HEADER GLOBAL -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand">
+        <h1>Esboços Bíblicos</h1>
+        <span class="subtitle">Pregações & Estudos</span>
+      </div>
+
+      <nav class="nav-actions">
+        <a href="planner.html">Planner</a>
+        <a href="reflexoes.html">Reflexões</a>
+        <a href="note.html">Diario</a>
+        <a href="esbocos.html">Contribuições</a>
+
+        <button class="logout-btn" type="button">Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTEUDO -->
+  <main class="page-container">
+    <section class="page-header">
+      <h2>Novo Esboço</h2>
+      <p>Estruture aqui mensagens para estudos, aulas ou pregações</p>
+    </section>
+
+    <section class="esboco-meta">
+      <div class="meta-field">
+        <label>Título da Mensagem</label>
+        <input type="text" placeholder="Ex: Vivendo para a Glória de Deus" />
+      </div>
+
+      <div class="meta-field">
+        <label>Texto Base</label>
+        <input type="text" placeholder="Ex: Romanos 11:36" />
+      </div>
+
+      <div class="meta-row">
+        <div class="meta-field">
+          <label>Data prevista</label>
+          <input type="date" />
+        </div>
+
+        <div class="meta-field">
+          <label>Local / Público</label>
+          <input type="text" placeholder="Ex: Culto Jovem / Escola Bíblica" />
+        </div>
+
+        <div class="meta-field">
+          <label>Visibilidade</label>
+          <select id="visibility">
+            <option value="private">Privado</option>
+            <option value="public">Público</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="esboco-content">
+      <div class="esboco-card">
+        <h3>Introdução</h3>
+        <textarea placeholder="Contexto, pergunta inicial, ilustração..."></textarea>
+      </div>
+
+      <div class="esboco-card">
+        <h3>Desenvolvimento</h3>
+        <textarea placeholder="Pontos principais, argumentos, explicação do texto..."></textarea>
+      </div>
+
+      <div class="esboco-card">
+        <h3>Aplicações</h3>
+        <textarea placeholder="O que o ouvinte deve fazer com essa mensagem?"></textarea>
+      </div>
+
+      <div class="esboco-card">
+        <h3>Conclusão</h3>
+        <textarea placeholder="Resumo, chamado final, oração..."></textarea>
+      </div>
+    </section>
+
+    <section class="note-actions">
+      <button class="action-btn" type="button">Salvar Esboço</button>
+      <button class="action-btn secondary" type="button">Ver Esboços</button>
+    </section>
+  </main>
+
+  <script type="module" src="./esboco.js"></script>
+</body>
+
+</html>

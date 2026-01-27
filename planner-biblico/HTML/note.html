@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diario Biblico - Anotacoes</title>
+  <link rel="stylesheet" href="../css/app.css" />
+</head>
+
+<body>
+  <!-- HEADER GLOBAL -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand">
+        <h1>Diario Biblico</h1>
+        <span class="subtitle">2026</span>
+      </div>
+
+      <nav class="nav-actions">
+        <a href="planner.html">Planner</a>
+        <a href="reflexoes.html">Reflexões</a>
+        <a href="note.html" class="active">Diario</a>
+        <a href="esbocos.html">Contribuições</a>
+
+        <button class="logout-btn" type="button">Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTEUDO -->
+  <main class="page-container">
+    <section class="page-header">
+      <h2>Diario do Dia</h2>
+      <p>Registre suas reflexões e aprendizados diários.</p>
+    </section>
+
+    <section class="note-section">
+      <div class="note-card">
+        <h3>Observacoes</h3>
+        <textarea id="note-observations" placeholder="O que chamou sua atencao no texto?"></textarea>
+      </div>
+
+      <div class="note-card">
+        <h3>Aprendizados</h3>
+        <textarea id="note-learnings" placeholder="O que Deus ensinou hoje atraves da leitura?"></textarea>
+      </div>
+
+      <div class="note-card">
+        <h3>Aplicacao / Oracao</h3>
+        <textarea id="note-application" placeholder="Como voce pode aplicar isso hoje?"></textarea>
+      </div>
+    </section>
+
+    <section class="note-actions">
+      <button class="action-btn" type="button">Salvar</button>
+      <button id="delete-note" class="action-btn danger" type="button">Apagar</button>
+      <a href="reflexoes.html" class="action-btn secondary">Ver Reflexões</a>
+      <a href="planner.html" class="action-btn secondary">Voltar ao Planner</a>
+    </section>
+  </main>
+
+  <script type="module" src="./note.js"></script>
+</body>
+
+</html>

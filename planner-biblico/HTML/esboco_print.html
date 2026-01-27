@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Esboço</title>
+  <link rel="stylesheet" href="../css/print.css" />
+</head>
+<body class="print-page">
+
+  <header class="banner">
+    <img src="../Assets/logo.svg" alt="Logo" />
+  </header>
+
+  <main class="document">
+    <section class="doc-header">
+      <h1 id="title"></h1>
+      <span class="user" id="user"></span>
+    </section>
+
+    <section class="meta">
+      <div><strong>Texto base:</strong> <span id="base_text"></span></div>
+      <div><strong>Data:</strong> <span id="date"></span></div>
+      <div><strong>Local:</strong> <span id="audience"></span></div>
+    </section>
+
+    <section>
+      <h2>Introdução</h2>
+      <p id="intro"></p>
+    </section>
+
+    <section>
+      <h2>Desenvolvimento</h2>
+      <p id="development"></p>
+    </section>
+
+    <section>
+      <h2>Aplicações</h2>
+      <p id="applications"></p>
+    </section>
+
+    <section>
+      <h2>Conclusão</h2>
+      <p id="conclusion"></p>
+    </section>
+  </main>
+
+  <button onclick="window.print()" class="print-btn">Imprimir</button>
+
+  <script type="module" src="../js/print.js"></script>
+</body>
+</html>

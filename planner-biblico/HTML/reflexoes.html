@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reflexões Diárias</title>
+  <link rel="stylesheet" href="../css/app.css" />
+</head>
+
+<body>
+  <!-- HEADER GLOBAL -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand">
+        <h1>Reflexões</h1>
+        <span class="subtitle">Privado</span>
+      </div>
+
+      <nav class="nav-actions">
+        <a href="planner.html">Planner</a>
+        <a href="reflexoes.html" class="active">Reflexões</a>
+        <a href="note.html">Diario</a>
+        <a href="esbocos.html">Contribuições</a>
+
+        <button class="logout-btn" type="button">Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTEUDO -->
+  <main class="page-container">
+    <section class="page-header">
+      <h2>Lista de Reflexões</h2>
+      <p>Somente você pode ver suas anotações diárias.</p>
+    </section>
+
+    <section class="note-actions">
+      <a id="new-note-link" href="note.html" class="action-btn">Nova Anotação</a>
+      <a href="planner.html" class="action-btn secondary">Voltar ao Planner</a>
+    </section>
+
+    <section id="reflexoes-list" class="note-section"></section>
+  </main>
+
+  <script type="module" src="./reflexoes.js"></script>
+</body>
+
+</html>

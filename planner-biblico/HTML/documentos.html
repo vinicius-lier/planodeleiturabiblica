@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentos - Anotações e Esboços</title>
+  <link rel="stylesheet" href="../css/app.css" />
+  <link rel="stylesheet" href="../css/print.css" media="print" />
+</head>
+
+<body class="documents-page">
+
+  <!-- HEADER GLOBAL -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand">
+        <h1>Documentos</h1>
+        <span class="subtitle">Anotações e Esboços</span>
+      </div>
+
+      <nav class="nav-actions">
+        <a href="planner.html">Planner</a>
+        <a href="reflexoes.html">Reflexões</a>
+        <a href="note.html">Diario</a>
+        <a href="esbocos.html">Contribuições</a>
+        <a href="documentos.html" class="active">Documentos</a>
+        <button class="logout-btn" type="button">Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTEUDO -->
+  <main class="page-container">
+    <section class="page-header">
+      <h2>Exportação</h2>
+      <p>Use esta página para visualizar tudo em formato de documento e imprimir/salvar em PDF.</p>
+    </section>
+
+    <section class="note-actions">
+      <button id="print-btn" class="action-btn" type="button">Imprimir / Salvar PDF</button>
+      <a href="planner.html" class="action-btn secondary">Voltar ao Planner</a>
+    </section>
+
+    <section>
+      <h3 class="docs-section-title">Anotações</h3>
+      <div id="docs-notes" class="note-section docs-section-content"></div>
+    </section>
+
+    <section>
+      <h3 class="docs-section-title">Esboços</h3>
+      <div id="docs-esbocos" class="note-section docs-section-content"></div>
+    </section>
+  </main>
+
+  <script type="module" src="./documentos.js"></script>
+</body>
+
+</html>

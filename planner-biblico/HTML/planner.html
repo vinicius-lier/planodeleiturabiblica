@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR" class="h-full">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planner Biblico 2026</title>
+
+  <!-- Tailwind (used by this page layout) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../css/app.css" />
+
+</head>
+
+<body class="h-full font-body">
+  <div id="app" class="h-full w-full overflow-auto planner-app">
+    <!-- Header -->
+    <header class="sticky top-0 z-10 px-4 py-4 border-b planner-header-bar">
+      <div class="max-w-5xl mx-auto">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 id="main-title" class="font-display text-xl md:text-2xl font-semibold planner-title-light">Plano de Leitura Biblica 2026</h1>
+            <p id="church-subtitle" class="text-sm mt-1 planner-subtitle-muted">DNMS</p>
+          </div>
+          <div class="text-right">
+            <div class="text-xs uppercase tracking-wider mb-1 planner-subtitle-muted">Progresso Anual</div>
+            <div id="annual-progress" class="font-display text-2xl font-bold planner-title-light">0%</div>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mt-3 h-2 rounded-full overflow-hidden planner-progress-track">
+          <div id="progress-bar" class="progress-bar h-full rounded-full planner-progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="planner-nav">
+        <nav class="nav-actions">
+          <a href="planner.html" class="active">Planner</a>
+          <a href="reflexoes.html">Reflexões</a>
+          <a href="note.html">Diario</a>
+          <a href="esbocos.html">Contribuições</a>
+          
+          <button class="logout-btn" type="button">Sair</button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Month Navigation -->
+    <div class="sticky top-24 z-10 px-4 py-3 border-b planner-month-nav-bar">
+      <div class="max-w-5xl mx-auto flex items-center justify-between">
+        <button id="prev-month" class="month-nav-btn p-2 rounded-full planner-month-nav-btn" type="button" aria-label="Mes anterior">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <div class="text-center">
+          <h2 id="current-month-name" class="font-display text-xl md:text-2xl font-semibold planner-month-name">Janeiro</h2>
+          <p id="month-progress-text" class="text-sm mt-1 planner-month-progress-text">0 de 31 leituras concluidas</p>
+        </div>
+
+        <button id="next-month" class="month-nav-btn p-2 rounded-full planner-month-nav-btn" type="button" aria-label="Proximo mes">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Calendar Grid -->
+    <main class="px-4 py-6 max-w-5xl mx-auto">
+      <!-- Weekday Headers -->
+      <div class="grid grid-cols-7 gap-1 mb-2">
+        <div class="text-center text-xs font-semibold py-2 uppercase tracking-wider planner-weekday-label">Dom</div>
+        <div class="text-center text-xs font-semibold py-2 uppercase tracking-wider planner-weekday-label">Seg</div>
+        <div class="text-center text-xs font-semibold py-2 uppercase tracking-wider planner-weekday-label">Ter</div>
+        <div class="text-center text-xs font-semibold py-2 uppercase tracking-wider planner-weekday-label">Qua</div>
+        <div class="text-center text-xs font-semibold py-2 uppercase tracking-wider planner-weekday-label">Qui</div>
+        <div class="text-center text-xs font-semibold py-2 uppercase tracking-wider planner-weekday-label">Sex</div>
+        <div class="text-center text-xs font-semibold py-2 uppercase tracking-wider planner-weekday-label">Sab</div>
+      </div>
+
+      <!-- Calendar Days -->
+      <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
+    </main>
+
+    <!-- Stats Footer -->
+    <footer class="px-4 py-6 mt-4 border-t planner-footer-bar">
+      <div class="max-w-5xl mx-auto">
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <div class="text-2xl font-display font-bold planner-stat-primary" id="total-completed">0</div>
+            <div class="text-xs uppercase tracking-wider mt-1 planner-stat-label">Leituras Feitas</div>
+          </div>
+          <div>
+            <div class="text-2xl font-display font-bold planner-stat-primary" id="total-remaining">365</div>
+            <div class="text-xs uppercase tracking-wider mt-1 planner-stat-label">Restantes</div>
+          </div>
+          <div>
+            <div class="text-2xl font-display font-bold planner-streak-accent" id="current-streak">0</div>
+            <div class="text-xs uppercase tracking-wider mt-1 planner-stat-label">Sequencia</div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="./planner.js"></script>
+</body>
+
+</html>

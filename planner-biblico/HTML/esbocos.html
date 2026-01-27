@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contribuições</title>
+  <link rel="stylesheet" href="../css/app.css" />
+</head>
+
+<body>
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand">
+        <h1>Contribuições</h1>
+        <span class="subtitle">Esboços públicos</span>
+      </div>
+
+      <nav class="nav-actions">
+        <a href="planner.html">Planner</a>
+        <a href="reflexoes.html">Reflexões</a>
+        <a href="note.html">Diario</a>
+        <a href="esbocos.html" class="active">Contribuições</a>
+       
+        
+
+        <button class="logout-btn" type="button">Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <section class="page-header">
+      <h2>Esboços</h2>
+      <p>Explore contribuições públicas e gerencie seus próprios esboços.</p>
+    </section>
+
+    <section class="note-actions">
+      <a class="action-btn" href="esboco.html">Novo Esboço</a>
+      <a class="action-btn secondary" href="planner.html">Voltar ao Planner</a>
+    </section>
+
+    <section class="note-card table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Autor</th>
+            <th>Status</th>
+            <th>Visibilidade</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="esbocos-body"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script type="module" src="./list.js"></script>
+</body>
+
+</html>

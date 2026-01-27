@@ -1,0 +1,268 @@
+@page {
+  margin: 2.5cm;
+}
+
+/* Documentos.html: print-only adjustments (screen layout stays in app.css). */
+@media print {
+  body.documents-page .app-header,
+  body.documents-page .note-actions {
+    display: none !important;
+  }
+
+  body.documents-page {
+    background: #fff !important;
+  }
+
+  body.documents-page .page-container {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+}
+
+/* Print/document view page (esboco_print.html) */
+body.print-page {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: #111;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  line-height: 1.55;
+}
+
+.print-page .banner {
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1.5rem 0.5rem;
+}
+
+.print-page .banner img {
+  width: auto;
+  max-width: 260px;
+  height: 64px;
+  display: block;
+}
+
+.print-page .document {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 5rem;
+}
+
+.print-page .doc-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.print-page .doc-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.print-page .doc-header .user {
+  color: #6b7280;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.print-page .meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.5rem 1.25rem;
+  margin: 0 0 1.25rem;
+  color: #374151;
+}
+
+.print-page section h2 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.print-page section p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.print-page .comments {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+}
+
+.print-page .comments h2 {
+  margin: 1.75rem 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.print-page .comment-form {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.9rem;
+  background: #fff;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.print-page .comment-form textarea,
+.print-page .comment-form input {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font: inherit;
+}
+
+.print-page .comment-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.print-page .comment-ref {
+  display: grid;
+  grid-template-columns: 1fr 110px 140px;
+  gap: 0.75rem;
+}
+
+.print-page .comment-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.print-page .comment-btn {
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.print-page .comment-btn.secondary {
+  background: transparent;
+  color: #111;
+}
+
+.print-page .comment-btn.danger {
+  border-color: #b91c1c;
+  background: transparent;
+  color: #b91c1c;
+}
+
+.print-page .comment-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.print-page .comment-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.85rem;
+  background: #fff;
+}
+
+.print-page .comment-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.print-page .comment-refline {
+  color: #374151;
+  font-size: 0.9rem;
+  margin: 0 0 0.35rem;
+}
+
+.print-page .comment-body {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.print-page .print-btn {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+@media print {
+  .print-page .print-btn {
+    display: none !important;
+  }
+
+  .print-page .comments {
+    display: none !important;
+  }
+
+  .print-page .document {
+    padding: 0;
+    max-width: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .print-page .banner {
+    padding: 1rem 1rem 0.25rem;
+  }
+
+  .print-page .banner img {
+    height: 56px;
+    max-width: 220px;
+  }
+
+  .print-page .document {
+    padding: 1.25rem 1rem 5rem;
+  }
+
+  .print-page .doc-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .print-page .meta {
+    grid-template-columns: 1fr;
+  }
+
+  .print-page .comments {
+    padding: 0 1rem 5rem;
+  }
+
+  .print-page .comment-ref {
+    grid-template-columns: 1fr;
+  }
+
+  .print-page .comment-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .print-page .comment-btn {
+    min-height: 44px;
+    width: 100%;
+  }
+
+  .print-page .print-btn {
+    left: 16px;
+    right: 16px;
+    width: auto;
+    min-height: 44px;
+  }
+}
+
