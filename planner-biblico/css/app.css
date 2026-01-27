@@ -779,13 +779,13 @@ th {
   #calendar-grid {
     /* Defensive: ensure the calendar grid is never hidden on mobile Safari. */
     display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 0.75rem !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.5rem !important;
   }
 
   #calendar-grid .day-cell {
     min-height: auto;
-    padding: 0.9rem !important;
+    padding: 0.65rem !important;
   }
 
   #calendar-grid .checkbox-custom {
