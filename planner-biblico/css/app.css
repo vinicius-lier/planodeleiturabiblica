@@ -770,12 +770,15 @@ th {
     overflow-x: hidden;
   }
 
-  /* Hide weekday header row (keeps day list readable on mobile). */
-  main > .grid.grid-cols-7:not(#calendar-grid) {
+  /* Hide weekday header row (keeps day list readable on mobile).
+     Avoid :not() here because some Safari versions can mis-handle complex selectors. */
+  main > .grid.grid-cols-7.mb-2 {
     display: none !important;
   }
 
   #calendar-grid {
+    /* Defensive: ensure the calendar grid is never hidden on mobile Safari. */
+    display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 0.75rem !important;
   }

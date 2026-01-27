@@ -1,10 +1,9 @@
 ﻿import { supabase } from "../js/supabase.js";
 import { requireAuth, signOut } from "../js/auth.js";
 
-const user = await requireAuth();
-if (!user) {
-  throw new Error("No session");
-}
+// NOTE: Avoid top-level await to keep compatibility with older iOS Safari versions.
+// If a browser can't parse top-level await, the module won't execute and the calendar stays empty.
+let user = null;
 
 const YEAR = 2026;
 
@@ -49,8 +48,21 @@ const totalCompletedEl = document.getElementById("total-completed");
 const totalRemainingEl = document.getElementById("total-remaining");
 const currentStreakEl = document.getElementById("current-streak");
 
-if (!calendarGrid) {
-  throw new Error("Missing calendar grid");
+function renderFatal(message) {
+  if (!calendarGrid) return;
+
+  console.error(message);
+  calendarGrid.innerHTML = "";
+
+  const card = document.createElement("div");
+  card.className = "note-card";
+
+  const p = document.createElement("p");
+  p.className = "status";
+  p.textContent = message;
+
+  card.appendChild(p);
+  calendarGrid.appendChild(card);
 }
 
 const pad = (value) => String(value).padStart(2, "0");
@@ -90,6 +102,7 @@ document.querySelectorAll(".logout-btn").forEach((btn) => {
 });
 
 async function loadYearProgress() {
+  if (!user?.id) throw new Error("No authenticated user (loadYearProgress)");
   const start = `${YEAR}-01-01`;
   const end = `${YEAR}-12-31`;
 
@@ -106,6 +119,7 @@ async function loadYearProgress() {
 }
 
 async function markReading(dateKey) {
+  if (!user?.id) throw new Error("No authenticated user (markReading)");
   const { error } = await supabase
     .from("reading_progress")
     .upsert(
@@ -117,6 +131,7 @@ async function markReading(dateKey) {
 }
 
 async function unmarkReading(dateKey) {
+  if (!user?.id) throw new Error("No authenticated user (unmarkReading)");
   const { error } = await supabase
     .from("reading_progress")
     .delete()
@@ -279,7 +294,27 @@ function renderCalendar() {
 }
 
 async function init() {
-  await loadYearProgress();
+  if (!calendarGrid) {
+    // If this element is missing, nothing else can render.
+    renderFatal("Erro: calendario nao encontrado (#calendar-grid).");
+    return;
+  }
+
+  try {
+    user = await requireAuth();
+  } catch (error) {
+    // requireAuth already redirects to index.html by default.
+    console.error("Auth required:", error);
+    return;
+  }
+
+  try {
+    await loadYearProgress();
+  } catch (error) {
+    // Avoid a blank calendar when the progress query fails (common on flaky mobile networks).
+    console.error("Erro ao carregar progresso:", error);
+  }
+
   updateNav();
   renderCalendar();
 
@@ -300,4 +335,6 @@ async function init() {
   }
 }
 
-init();
+init().catch((error) => {
+  renderFatal(error?.message || "Erro inesperado ao inicializar o planner.");
+});
