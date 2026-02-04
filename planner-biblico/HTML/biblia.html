@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bíblia</title>
+  <link rel="stylesheet" href="../css/app.css" />
+  <link rel="stylesheet" href="../css/biblia.css" />
+</head>
+
+<body class="biblia-page">
+  <!-- Layout inspirado no bible.com (leitura em foco) -->
+  <header class="bible-topbar">
+    <div class="bible-topbar-main">
+      <a class="icon-btn back-btn" href="planner.html" aria-label="Voltar ao Planner">←</a>
+
+      <div class="bible-topbar-title">
+        <div id="reference" class="reference">Bíblia</div>
+        <div class="translation"> Tradução - Almeida</div>
+      </div>
+
+      <div class="bible-topbar-nav" aria-label="Navegação de capítulos">
+        <button id="prevChapterBtn" class="icon-btn" type="button" aria-label="Capítulo anterior">‹</button>
+        <button id="nextChapterBtn" class="icon-btn" type="button" aria-label="Próximo capítulo">›</button>
+      </div>
+    </div>
+
+    <div class="bible-topbar-actions" aria-label="Seletores">
+      <button id="openBookPicker" class="top-action" type="button">Livro</button>
+      <button id="openChapterPicker" class="top-action" type="button">Capítulo</button>
+      <button id="openVersePicker" class="top-action" type="button">Versículos</button>
+      <button id="loadBtn" class="top-action ghost" type="button">Atualizar</button>
+    </div>
+  </header>
+
+  <main class="bible-main" aria-live="polite">
+    <article id="verses" class="reading"></article>
+  </main>
+
+  <!-- Menu contextual (versículo) -->
+  <div id="verseMenu" class="context-overlay" hidden>
+    <div class="context-sheet" role="dialog" aria-modal="true" aria-labelledby="verseMenuTitle">
+      <div class="context-header">
+        <div class="context-title">
+          <div id="verseMenuTitle" class="context-ref">—</div>
+          <div class="context-subtitle">Marcar / Anotar</div>
+        </div>
+        <button id="closeVerseMenu" class="icon-btn" type="button" aria-label="Fechar">✕</button>
+      </div>
+
+      <div class="context-body">
+        <div class="context-section">
+          <div class="context-label">Cor</div>
+          <div class="color-row" role="group" aria-label="Cores de marcação">
+            <button class="color-chip" type="button" data-color="yellow">Amarelo</button>
+            <button class="color-chip" type="button" data-color="green">Verde</button>
+            <button class="color-chip" type="button" data-color="blue">Azul</button>
+            <button class="color-chip" type="button" data-color="red">Vermelho</button>
+          </div>
+        </div>
+
+        <p id="verseMenuStatus" class="context-status" aria-live="polite" hidden></p>
+
+        <div class="context-actions" role="group" aria-label="Ações">
+          <button id="createNoteFromVerse" class="action-pill" type="button">Criar anotação</button>
+          <button id="removeHighlight" class="action-pill danger" type="button">Remover marcação</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pickers (bottom sheet) -->
+  <div id="bookPicker" class="picker-overlay" hidden>
+    <div class="picker-sheet" role="dialog" aria-modal="true" aria-labelledby="bookPickerTitle">
+      <div class="picker-header">
+        <h2 id="bookPickerTitle">Livros</h2>
+        <button id="closeBookPicker" class="icon-btn" type="button" aria-label="Fechar">✕</button>
+      </div>
+      <div id="bookButtons" class="book-groups" aria-label="Livros"></div>
+    </div>
+  </div>
+
+  <div id="chapterPicker" class="picker-overlay" hidden>
+    <div class="picker-sheet" role="dialog" aria-modal="true" aria-labelledby="chapterPickerTitle">
+      <div class="picker-header">
+        <h2 id="chapterPickerTitle">Capítulos</h2>
+        <button id="closeChapterPicker" class="icon-btn" type="button" aria-label="Fechar">✕</button>
+      </div>
+      <div id="chapterButtons" class="button-grid" role="group" aria-label="Capítulos"></div>
+    </div>
+  </div>
+
+  <div id="versePicker" class="picker-overlay" hidden>
+    <div class="picker-sheet" role="dialog" aria-modal="true" aria-labelledby="versePickerTitle">
+      <div class="picker-header">
+        <h2 id="versePickerTitle">Versículos</h2>
+        <button id="closeVersePicker" class="icon-btn" type="button" aria-label="Fechar">✕</button>
+      </div>
+      <div id="verseButtons" class="button-grid" role="group" aria-label="Versículos"></div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/biblia.js"></script>
+</body>
+
+</html>

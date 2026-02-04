@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Diario Biblico - Anotacoes</title>
+  <title>Anotações</title>
   <link rel="stylesheet" href="../css/app.css" />
 </head>
 
@@ -13,15 +13,16 @@
   <header class="app-header">
     <div class="header-content">
       <div class="brand">
-        <h1>Diario Biblico</h1>
+        <h1>Anotações</h1>
         <span class="subtitle">2026</span>
       </div>
 
       <nav class="nav-actions">
         <a href="planner.html">Planner</a>
-        <a href="reflexoes.html">Reflexões</a>
-        <a href="note.html" class="active">Diario</a>
-        <a href="esbocos.html">Contribuições</a>
+        <a href="biblia.html">Bíblia</a>
+        <a href="reflexoes.html" class="active">Anotações</a>
+        <a href="esbocos.html">Esboços</a>
+        <a href="documentos.html">Documentos</a>
 
         <button class="logout-btn" type="button">Sair</button>
       </nav>
@@ -31,31 +32,28 @@
   <!-- CONTEUDO -->
   <main class="page-container">
     <section class="page-header">
-      <h2>Diario do Dia</h2>
-      <p>Registre suas reflexões e aprendizados diários.</p>
+      <h2 id="pageTitle">Anotação</h2>
+      <p id="pageDescription">Escreva sua anotação.</p>
     </section>
 
     <section class="note-section">
-      <div class="note-card">
-        <h3>Observacoes</h3>
-        <textarea id="note-observations" placeholder="O que chamou sua atencao no texto?"></textarea>
+      <div id="noteContextCard" class="note-card" hidden>
+        <h3>Referência</h3>
+        <a id="noteRefLink" href="biblia.html" class="action-btn secondary">—</a>
+        <p id="noteQuote" class="status" style="margin-top:0.75rem;"></p>
       </div>
 
       <div class="note-card">
-        <h3>Aprendizados</h3>
-        <textarea id="note-learnings" placeholder="O que Deus ensinou hoje atraves da leitura?"></textarea>
-      </div>
-
-      <div class="note-card">
-        <h3>Aplicacao / Oracao</h3>
-        <textarea id="note-application" placeholder="Como voce pode aplicar isso hoje?"></textarea>
+        <h3 id="noteContentLabel">Anotação</h3>
+        <textarea id="note-content" placeholder="Escreva aqui..."></textarea>
       </div>
     </section>
 
     <section class="note-actions">
       <button class="action-btn" type="button">Salvar</button>
       <button id="delete-note" class="action-btn danger" type="button">Apagar</button>
-      <a href="reflexoes.html" class="action-btn secondary">Ver Reflexões</a>
+      <a id="back-to-bible" href="biblia.html" class="action-btn secondary" hidden>Voltar ao Texto</a>
+      <a href="reflexoes.html" class="action-btn secondary">Ver Anotações</a>
       <a href="planner.html" class="action-btn secondary">Voltar ao Planner</a>
     </section>
   </main>

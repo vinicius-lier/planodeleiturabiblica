@@ -1,39 +1,22 @@
 import { supabase } from "../js/supabase.js";
 import { requireAuth, signOut } from "../js/auth.js";
 
-const user = await requireAuth();
-if (!user) {
-  throw new Error("No session");
-}
+let user = null;
 
-const YEAR = 2026;
-const pad = (value) => String(value).padStart(2, "0");
-const getDefaultDateKey = () => {
-  const now = new Date();
-  if (now.getFullYear() === YEAR) {
-    return `${YEAR}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-  }
-  return `${YEAR}-01-01`;
-};
-
-const diaryNavLink = document.querySelector('.nav-actions a[href="note.html"]');
-if (diaryNavLink) diaryNavLink.href = `note.html?day=${getDefaultDateKey()}`;
-
-document.querySelectorAll(".logout-btn").forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error(error);
-      window.location.href = "index.html";
-    }
+function wireLogout() {
+  document.querySelectorAll(".logout-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      try {
+        await signOut();
+      } catch (error) {
+        console.error(error);
+        window.location.href = "index.html";
+      }
+    });
   });
-});
+}
 
 const printBtn = document.getElementById("print-btn");
-if (printBtn) {
-  printBtn.addEventListener("click", () => window.print());
-}
 
 const notesRoot = document.getElementById("docs-notes");
 const outlinesRoot = document.getElementById("docs-esbocos");
@@ -86,13 +69,27 @@ function renderNotes(notes) {
     const title = el("h3");
     title.style.margin = "0 0 0.5rem";
     title.style.color = "var(--primary)";
-    title.textContent = note.date_key || "(sem data)";
+    if (note.book && note.chapter && note.verse_start) {
+      const book = String(note.book).toUpperCase();
+      const chapter = Number(note.chapter);
+      const start = Number(note.verse_start);
+      const end = Number(note.verse_end || note.verse_start);
+      const range = end > start ? `:${start}–${end}` : `:${start}`;
+      title.textContent = `${book} ${chapter}${range}`;
+    } else {
+      title.textContent = note.date_key || "(sem data)";
+    }
     card.appendChild(title);
 
-    addField(card, "Observações", note.observations);
-    addField(card, "Aprendizados", note.structure);
-    addField(card, "Aplicação / Oração", note.christocentric);
-    addField(card, "Resumo", note.summary);
+    if ((note.content ?? "").toString().trim()) {
+      addField(card, "Anotação", note.content);
+    } else {
+      // Compat: notas antigas do "Diário" podem estar em campos separados.
+      addField(card, "Observações", note.observations);
+      addField(card, "Aprendizados", note.structure);
+      addField(card, "Aplicação / Oração", note.christocentric);
+      addField(card, "Resumo", note.summary);
+    }
 
     notesRoot.appendChild(card);
   });
@@ -140,9 +137,12 @@ async function loadData() {
   const [notesRes, outlinesRes] = await Promise.all([
     supabase
       .from("notes")
-      .select("id,date_key,observations,structure,christocentric,summary,updated_at")
+      .select(
+        "id,content,date_key,book,chapter,verse_start,verse_end,observations,structure,christocentric,summary,updated_at,created_at"
+      )
       .eq("user_id", user.id)
-      .order("date_key", { ascending: true }),
+      .order("date_key", { ascending: true, nullsFirst: false })
+      .order("updated_at", { ascending: true }),
     supabase
       .from("esbocos")
       .select(
@@ -167,4 +167,23 @@ async function loadData() {
   }
 }
 
-loadData();
+async function init() {
+  wireLogout();
+
+  if (printBtn) printBtn.addEventListener("click", () => window.print());
+
+  try {
+    user = await requireAuth();
+  } catch (error) {
+    console.error("Auth required:", error);
+    return;
+  }
+
+  if (!user) return;
+  await loadData();
+}
+
+init().catch((error) => {
+  console.error(error);
+  renderEmpty(notesRoot, "Erro inesperado ao carregar documentos.");
+});
