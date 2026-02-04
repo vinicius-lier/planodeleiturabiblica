@@ -418,7 +418,10 @@ function buildDayCell({
     cell.style.backgroundColor = "#F7FAFC";
   }
 
-  cell.addEventListener("click", () => {
+  cell.addEventListener("click", (event) => {
+    // Evita navegação ao interagir com a checkbox (especialmente em mobile).
+    if (event?.target?.closest?.('input[type="checkbox"]')) return;
+
     const route = getBibleRouteForChapters(chapters, dateKey);
     if (route) {
       window.location.href = route;
@@ -429,7 +432,11 @@ function buildDayCell({
 
   const checkbox = cell.querySelector('input[type="checkbox"]');
   if (checkbox) {
-    checkbox.addEventListener("click", (event) => event.stopPropagation());
+    const stop = (event) => event.stopPropagation();
+    checkbox.addEventListener("pointerdown", stop);
+    checkbox.addEventListener("mousedown", stop);
+    checkbox.addEventListener("touchstart", stop, { passive: true });
+    checkbox.addEventListener("click", stop);
     checkbox.disabled = !isToday || isTodayLocked;
 
     checkbox.addEventListener("change", (event) => {
