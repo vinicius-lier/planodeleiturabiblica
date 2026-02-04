@@ -388,6 +388,7 @@ function buildDayCell({
   chapters,
   isCompleted,
   isToday,
+  isTodayLocked,
   onMarkToday
 }) {
   const reading = formatReading(chapters);
@@ -405,7 +406,7 @@ function buildDayCell({
       <div class="flex items-start justify-between mb-1">
         <span class="text-xs font-semibold rounded px-1.5 py-0.5 planner-day-pill">${day}</span>
         <input type="checkbox" class="checkbox-custom planner-checkbox-accent" data-date="${dateKey}" ${
-          !isToday && isCompleted ? "checked" : ""
+          (isTodayLocked || (!isToday && isCompleted)) ? "checked" : ""
         } aria-label="Marcar leitura de ${reading} como concluida">
       </div>
       <p class="text-xs font-medium leading-tight mt-1 planner-reading-text">${reading}</p>
@@ -429,7 +430,7 @@ function buildDayCell({
   const checkbox = cell.querySelector('input[type="checkbox"]');
   if (checkbox) {
     checkbox.addEventListener("click", (event) => event.stopPropagation());
-    checkbox.disabled = !isToday;
+    checkbox.disabled = !isToday || isTodayLocked;
 
     checkbox.addEventListener("change", (event) => {
       const wantsCheck = event.target.checked;
@@ -441,8 +442,6 @@ function buildDayCell({
       }
 
       if (!wantsCheck) return;
-
-      event.target.checked = false;
       onMarkToday();
     });
   }
@@ -462,6 +461,11 @@ function init() {
   const totalReadings = isLeapYear(year) ? 366 : 365;
   const now = new Date();
   let currentMonth = now.getFullYear() === year ? now.getMonth() : 0;
+
+  const sessionState = {
+    lockedTodayKey: null,
+    lockedTodayChapters: null
+  };
 
   let plan = buildIdealPlanForYear(year);
   let completedSet = buildCompletedSetFromChaptersRead({
@@ -493,6 +497,9 @@ function init() {
 
     const daysInMonth = getDaysInMonth(year, currentMonth);
     const firstDay = getFirstDayOfWeek(year, currentMonth);
+    const today = startOfLocalDay(new Date());
+    const todayKey = dateKeyFor(year, today.getMonth(), today.getDate());
+    const isTodayLocked = sessionState.lockedTodayKey === todayKey;
 
     for (let i = 0; i < firstDay; i++) {
       const emptyCell = document.createElement("div");
@@ -505,7 +512,7 @@ function init() {
       const isToday = isTodayDateKey(year, dateKey);
 
       const chapters = isToday
-        ? getTodayReading(new Date())
+        ? (isTodayLocked ? sessionState.lockedTodayChapters : getTodayReading(new Date()))
         : (() => {
             const entry = plan.get(dateKey);
             if (!entry || entry.count <= 0) return [];
@@ -519,7 +526,12 @@ function init() {
         chapters,
         isCompleted: completedSet.has(dateKey),
         isToday,
+        isTodayLocked: isToday && isTodayLocked,
         onMarkToday: () => {
+          // "Marca leitura" do dia: trava visualmente a leitura de hoje na sessão,
+          // avança chaptersRead e recalcula automaticamente a leitura seguinte.
+          sessionState.lockedTodayKey = todayKey;
+          sessionState.lockedTodayChapters = chapters;
           markAsRead(new Date());
           refreshDerivedState();
           renderCalendar();
