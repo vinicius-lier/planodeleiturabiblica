@@ -1,4 +1,4 @@
-// Planner anual com leitura dinâmica (frontend-only).
+// Planner anual de leitura bíblica (frontend-only).
 // Persistência mínima (localStorage):
 // - plannerYear (ano atual)
 // - chaptersRead (total de capítulos já lidos)
@@ -9,8 +9,8 @@ const STORAGE_KEYS = {
   chaptersRead: "chaptersRead"
 };
 
-// Abreviações exibidas no planner (mantém o padrão atual do projeto).
-// Os códigos OSIS são usados para navegar para `biblia.html`.
+// Bíblia como sequência contínua de capítulos (0..1188).
+// Abreviações exibidas no planner + código OSIS para navegação em `biblia.html`.
 const BIBLE_BOOKS = [
   { abbrev: "Gn", osis: "GEN", chapters: 50 },
   { abbrev: "Êx", osis: "EXO", chapters: 40 },
@@ -104,10 +104,10 @@ const BIBLE = (() => {
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const pad2 = (value) => String(value).padStart(2, "0");
-const startOfLocalDay = (date) =>
-  new Date(date.getFullYear(), date.getMonth(), date.getDate());
 const dateKeyFor = (year, monthIndex, day) =>
   `${year}-${pad2(monthIndex + 1)}-${pad2(day)}`;
+const startOfLocalDay = (date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
 function clampInt(value, min, max) {
   if (!Number.isFinite(value)) return min;
@@ -131,7 +131,10 @@ function resetIfNewYear() {
   if (storedYear !== yearNow) {
     localStorage.setItem(STORAGE_KEYS.plannerYear, String(yearNow));
     localStorage.setItem(STORAGE_KEYS.chaptersRead, "0");
-  } else if (!localStorage.getItem(STORAGE_KEYS.plannerYear)) {
+    return;
+  }
+
+  if (!localStorage.getItem(STORAGE_KEYS.plannerYear)) {
     localStorage.setItem(STORAGE_KEYS.plannerYear, String(yearNow));
   }
 }
@@ -245,7 +248,8 @@ function buildIdealPlanForYear(year) {
     cursor.setDate(cursor.getDate() + 1)
   ) {
     const cursorDay = startOfLocalDay(cursor);
-    const daysRemaining = Math.floor((end.getTime() - cursorDay.getTime()) / MS_PER_DAY) + 1;
+    const daysRemaining =
+      Math.floor((end.getTime() - cursorDay.getTime()) / MS_PER_DAY) + 1;
     const remaining = TOTAL_CHAPTERS - chaptersRead;
     const count = remaining > 0 ? Math.ceil(remaining / Math.max(1, daysRemaining)) : 0;
     const safeCount = Math.max(0, Math.min(remaining, count));
@@ -255,7 +259,6 @@ function buildIdealPlanForYear(year) {
     chaptersRead += safeCount;
   }
 
-  // Ajuste de segurança para fechar exatamente em 1189 capítulos no ano.
   if (chaptersRead !== TOTAL_CHAPTERS) {
     const delta = TOTAL_CHAPTERS - chaptersRead;
     const lastKey = `${year}-12-31`;
@@ -272,7 +275,6 @@ function buildCompletedSetFromChaptersRead({ year, chaptersRead, plan }) {
     if (entry.startIndex + entry.count <= chaptersRead) completed.add(dateKey);
   }
 
-  // Safety: só mantém date_keys do ano atual.
   for (const key of completed) {
     if (!String(key).startsWith(`${year}-`)) completed.delete(key);
   }
@@ -345,12 +347,6 @@ function getFirstDayOfWeek(year, monthIndex) {
   return new Date(year, monthIndex, 1).getDay();
 }
 
-function isTodayDateKey(year, dateKey) {
-  const today = startOfLocalDay(new Date());
-  const key = dateKeyFor(year, today.getMonth(), today.getDate());
-  return dateKey === key;
-}
-
 function updateNav({ currentMonth }) {
   if (currentMonthNameEl) currentMonthNameEl.textContent = monthNames[currentMonth];
   if (prevMonthBtn) prevMonthBtn.disabled = currentMonth === 0;
@@ -382,14 +378,12 @@ function updateAnnualStats({ year, completedSet, totalReadings }) {
 }
 
 function buildDayCell({
-  year,
   day,
   dateKey,
   chapters,
   isCompleted,
-  isToday,
-  isTodayLocked,
-  onMarkToday
+  isMarkable,
+  onMark
 }) {
   const reading = formatReading(chapters);
   const cell = document.createElement("div");
@@ -406,7 +400,7 @@ function buildDayCell({
       <div class="flex items-start justify-between mb-1">
         <span class="text-xs font-semibold rounded px-1.5 py-0.5 planner-day-pill">${day}</span>
         <input type="checkbox" class="checkbox-custom planner-checkbox-accent" data-date="${dateKey}" ${
-          (isTodayLocked || (!isToday && isCompleted)) ? "checked" : ""
+          isCompleted ? "checked" : ""
         } aria-label="Marcar leitura de ${reading} como concluida">
       </div>
       <p class="text-xs font-medium leading-tight mt-1 planner-reading-text">${reading}</p>
@@ -419,7 +413,6 @@ function buildDayCell({
   }
 
   cell.addEventListener("click", (event) => {
-    // Evita navegação ao interagir com a checkbox (especialmente em mobile).
     if (event?.target?.closest?.('input[type="checkbox"]')) return;
 
     const route = getBibleRouteForChapters(chapters, dateKey);
@@ -437,19 +430,16 @@ function buildDayCell({
     checkbox.addEventListener("mousedown", stop);
     checkbox.addEventListener("touchstart", stop, { passive: true });
     checkbox.addEventListener("click", stop);
-    checkbox.disabled = !isToday || isTodayLocked;
+
+    checkbox.disabled = !reading || isCompleted || !isMarkable;
 
     checkbox.addEventListener("change", (event) => {
       const wantsCheck = event.target.checked;
-
-      if (!isToday) {
-        // Sem histórico por dia, não desfazemos progresso em datas passadas.
-        if (!wantsCheck) event.target.checked = true;
+      if (!wantsCheck) {
+        event.target.checked = true;
         return;
       }
-
-      if (!wantsCheck) return;
-      onMarkToday();
+      onMark();
     });
   }
 
@@ -470,7 +460,6 @@ function init() {
   let currentMonth = now.getFullYear() === year ? now.getMonth() : 0;
 
   const sessionState = {
-    lockedTodayKey: null,
     lockedTodayChapters: null
   };
 
@@ -481,7 +470,6 @@ function init() {
     plan
   });
 
-  // Header nav: mantém o botão sem backend nesta página.
   document.querySelectorAll(".logout-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       window.location.href = "index.html";
@@ -497,6 +485,18 @@ function init() {
     });
   }
 
+  function getPlannedReading(dateKey) {
+    const entry = plan.get(dateKey);
+    if (!entry || entry.count <= 0) return [];
+    return BIBLE.slice(entry.startIndex, entry.startIndex + entry.count);
+  }
+
+  function getPlannedEndIndex(dateKey) {
+    const entry = plan.get(dateKey);
+    if (!entry) return null;
+    return entry.startIndex + entry.count;
+  }
+
   function renderCalendar() {
     calendarGrid.innerHTML = "";
 
@@ -506,7 +506,6 @@ function init() {
     const firstDay = getFirstDayOfWeek(year, currentMonth);
     const today = startOfLocalDay(new Date());
     const todayKey = dateKeyFor(year, today.getMonth(), today.getDate());
-    const isTodayLocked = sessionState.lockedTodayKey === todayKey;
 
     for (let i = 0; i < firstDay; i++) {
       const emptyCell = document.createElement("div");
@@ -516,30 +515,32 @@ function init() {
 
     for (let day = 1; day <= daysInMonth; day++) {
       const dateKey = dateKeyFor(year, currentMonth, day);
-      const isToday = isTodayDateKey(year, dateKey);
+      const isFuture = dateKey > todayKey;
+      const isToday = dateKey === todayKey;
 
       const chapters = isToday
-        ? (isTodayLocked ? sessionState.lockedTodayChapters : getTodayReading(new Date()))
-        : (() => {
-            const entry = plan.get(dateKey);
-            if (!entry || entry.count <= 0) return [];
-            return BIBLE.slice(entry.startIndex, entry.startIndex + entry.count);
-          })();
+        ? (sessionState.lockedTodayChapters || getTodayReading(new Date()))
+        : getPlannedReading(dateKey);
 
       const cell = buildDayCell({
-        year,
         day,
         dateKey,
         chapters,
         isCompleted: completedSet.has(dateKey),
-        isToday,
-        isTodayLocked: isToday && isTodayLocked,
-        onMarkToday: () => {
-          // "Marca leitura" do dia: trava visualmente a leitura de hoje na sessão,
-          // avança chaptersRead e recalcula automaticamente a leitura seguinte.
-          sessionState.lockedTodayKey = todayKey;
-          sessionState.lockedTodayChapters = chapters;
-          markAsRead(new Date());
+        isMarkable: !isFuture,
+        onMark: () => {
+          if (isFuture) return;
+
+          if (isToday) {
+            sessionState.lockedTodayChapters = chapters;
+            markAsRead(new Date());
+          } else {
+            const plannedEnd = getPlannedEndIndex(dateKey);
+            if (plannedEnd != null) {
+              setChaptersRead(Math.max(getChaptersRead(), plannedEnd));
+            }
+          }
+
           refreshDerivedState();
           renderCalendar();
         }
@@ -577,3 +578,4 @@ try {
 } catch (error) {
   renderFatal(error?.message || "Erro inesperado ao inicializar o planner.");
 }
+
