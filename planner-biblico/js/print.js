@@ -1,38 +1,10 @@
 import { supabase } from "../js/supabase.js";
 import { requireAuth } from "../js/auth.js";
 
-const user = await requireAuth();
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
-const autoPrint = params.get("print") === "1";
-
-if (!id) {
-  throw new Error("Missing id param");
-}
-
-const { data, error } = await supabase
-  .from("esbocos")
-  .select("*")
-  .eq("id", id)
-  .limit(1);
-
-if (error) throw error;
-
-const row = Array.isArray(data) ? data[0] : null;
-if (!row) {
-  throw new Error("Esboco nao encontrado");
-}
-
-document.getElementById("title").textContent = row.title || "";
-document.getElementById("base_text").textContent = row.base_text || "";
-document.getElementById("date").textContent = row.scheduled_for || "";
-document.getElementById("audience").textContent = row.audience || "";
-document.getElementById("intro").textContent = row.intro || "";
-document.getElementById("development").textContent = row.development || "";
-document.getElementById("applications").textContent = row.applications || "";
-document.getElementById("conclusion").textContent = row.conclusion || "";
-document.getElementById("user").textContent =
-  row.user_id === user.id ? user.email : row.user_id;
+let user = null;
+let id = null;
+let autoPrint = false;
+let row = null;
 
 function formatUserId(value) {
   if (!value) return "-";
@@ -298,12 +270,56 @@ function mountCommentsUI() {
   refresh().catch(console.error);
 }
 
-// Only public outlines can be commented.
-if (row.visibility === "public") {
-  mountCommentsUI();
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  id = params.get("id");
+  autoPrint = params.get("print") === "1";
+
+  if (!id) throw new Error("Missing id param");
+
+  try {
+    user = await requireAuth();
+  } catch (error) {
+    console.error("Auth required:", error);
+    return;
+  }
+
+  if (!user) return;
+
+  const { data, error } = await supabase
+    .from("esbocos")
+    .select("*")
+    .eq("id", id)
+    .limit(1);
+
+  if (error) throw error;
+
+  row = Array.isArray(data) ? data[0] : null;
+  if (!row) throw new Error("Esboço não encontrado");
+
+  document.getElementById("title").textContent = row.title || "";
+  document.getElementById("base_text").textContent = row.base_text || "";
+  document.getElementById("date").textContent = row.scheduled_for || "";
+  document.getElementById("audience").textContent = row.audience || "";
+  document.getElementById("intro").textContent = row.intro || "";
+  document.getElementById("development").textContent = row.development || "";
+  document.getElementById("applications").textContent = row.applications || "";
+  document.getElementById("conclusion").textContent = row.conclusion || "";
+  document.getElementById("user").textContent =
+    row.user_id === user.id ? user.email : row.user_id;
+
+  // Only public outlines can be commented.
+  if (row.visibility === "public") {
+    mountCommentsUI();
+  }
+
+  if (autoPrint) {
+    // Give the browser a moment to paint the page and load the logo before printing.
+    setTimeout(() => window.print(), 350);
+  }
 }
 
-if (autoPrint) {
-  // Give the browser a moment to paint the page and load the logo before printing.
-  setTimeout(() => window.print(), 350);
-}
+init().catch((error) => {
+  console.error(error);
+  alert(error?.message || "Erro ao carregar esboço.");
+});

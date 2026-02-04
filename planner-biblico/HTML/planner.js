@@ -1,11 +1,10 @@
 ﻿import { supabase } from "../js/supabase.js";
 import { requireAuth, signOut } from "../js/auth.js";
+import { YEAR } from "../js/date.js";
 
 // NOTE: Avoid top-level await to keep compatibility with older iOS Safari versions.
 // If a browser can't parse top-level await, the module won't execute and the calendar stays empty.
 let user = null;
-
-const YEAR = 2026;
 
 const readingPlan = {
   1: ["Gn 1–3", "Gn 4–6", "Gn 7–9", "Gn 10–12", "Gn 13–15", "Gn 16–18", "Gn 19–21", "Gn 22–24", "Gn 25–27", "Gn 28–30", "Gn 31–33", "Gn 34–36", "Gn 37–39", "Gn 40–42", "Gn 43–45", "Gn 46–48", "Gn 49–50", "Êx 1–3", "Êx 4–6", "Êx 7–9", "Êx 10–12", "Êx 13–15", "Êx 16–18", "Êx 19–21", "Êx 22–24", "Êx 25–27", "Êx 28–30", "Êx 31–33", "Êx 34–36", "Êx 37–40", "Lv 1–3"],
@@ -21,6 +20,103 @@ const readingPlan = {
   11: ["Lc 7–8", "Lc 9–10", "Lc 11–12", "Lc 13–14", "Lc 15–16", "Lc 17–18", "Lc 19–20", "Lc 21–22", "Lc 23–24", "Jo 1–3", "Jo 4–5", "Jo 6–7", "Jo 8–9", "Jo 10–11", "Jo 12–13", "Jo 14–16", "Jo 17–18", "Jo 19–21", "At 1–3", "At 4–6", "At 7–8", "At 9–10", "At 11–13", "At 14–15", "At 16–17", "At 18–19", "At 20–21", "At 22–23", "At 24–26", "At 27–28"],
   12: ["Rm 1–3", "Rm 4–6", "Rm 7–9", "Rm 10–12", "Rm 13–16", "1Co 1–4", "1Co 5–8", "1Co 9–11", "1Co 12–14", "1Co 15–16", "2Co 1–4", "2Co 5–8", "2Co 9–13", "Gl 1–3", "Gl 4–6", "Ef 1–3", "Ef 4–6", "Fp 1–4", "Cl 1–4", "1Ts 1–5", "2Ts 1–3", "1Tm 1–3", "1Tm 4–6", "2Tm 1–4", "Tt 1–3", "Fm; Hb 1–2", "Hb 3–6", "Hb 7–10", "Hb 11–13", "Tg 1–5", "1Pe 1–5"]
 };
+
+// Converte abreviações do plano (ex.: "Gn", "Sl", "1Co") para códigos OSIS usados em `biblia.html`.
+// A navegação do planner sempre abre o primeiro capítulo listado (reduz fricção).
+const BIBLE_BOOK_CODE_BY_PLAN_ABBREV = {
+  Gn: "GEN",
+  "Êx": "EXO",
+  Lv: "LEV",
+  Nm: "NUM",
+  Dt: "DEU",
+  Js: "JOS",
+  Jz: "JDG",
+  Rt: "RUT",
+  "1Sm": "1SA",
+  "2Sm": "2SA",
+  "1Rs": "1KI",
+  "2Rs": "2KI",
+  "1Cr": "1CH",
+  "2Cr": "2CH",
+  Ed: "EZR",
+  Ne: "NEH",
+  Et: "EST",
+  Jó: "JOB",
+  Sl: "PSA",
+  Pv: "PRO",
+  Ec: "ECC",
+  Ct: "SNG",
+  Is: "ISA",
+  Jr: "JER",
+  Lm: "LAM",
+  Ez: "EZK",
+  Dn: "DAN",
+  Os: "HOS",
+  Jl: "JOL",
+  Am: "AMO",
+  Ob: "OBA",
+  Jn: "JON",
+  Mq: "MIC",
+  Na: "NAM",
+  Hc: "HAB",
+  Sf: "ZEP",
+  Ag: "HAG",
+  Zc: "ZEC",
+  Ml: "MAL",
+  Mt: "MAT",
+  Mc: "MRK",
+  Lc: "LUK",
+  Jo: "JHN",
+  At: "ACT",
+  Rm: "ROM",
+  "1Co": "1CO",
+  "2Co": "2CO",
+  Gl: "GAL",
+  Ef: "EPH",
+  Fp: "PHP",
+  Cl: "COL",
+  "1Ts": "1TH",
+  "2Ts": "2TH",
+  "1Tm": "1TI",
+  "2Tm": "2TI",
+  Tt: "TIT",
+  Fm: "PHM",
+  Hb: "HEB",
+  Tg: "JAS",
+  "1Pe": "1PE"
+};
+
+function getBibleRouteForReading(reading, dateKey) {
+  if (!reading) return null;
+
+  // Ex.: "Ob; Jn 1–2" => "Ob"
+  const firstSegment = String(reading).split(";")[0].trim();
+  if (!firstSegment) return null;
+
+  // Ex.: "Gn 1–3" => bookToken="Gn", rest="1–3"
+  const match = firstSegment.match(/^(\S+)(?:\s+(.*))?$/);
+  if (!match) return null;
+
+  const bookToken = match[1];
+  const rest = match[2] || "";
+
+  const bookCode = BIBLE_BOOK_CODE_BY_PLAN_ABBREV[bookToken] || null;
+  if (!bookCode) return null;
+
+  // Se o plano omite capítulo (ex.: "Ob"), assumimos 1.
+  const startChapterMatch = rest.match(/(\d+)/);
+  const startChapter = startChapterMatch ? Number.parseInt(startChapterMatch[1], 10) : 1;
+  if (!Number.isFinite(startChapter) || startChapter < 1) return null;
+
+  const params = new URLSearchParams({
+    book: bookCode,
+    chapter: String(startChapter),
+    origin: "planner",
+    day: String(dateKey || "")
+  });
+
+  return `biblia.html?${params.toString()}`;
+}
 
 const monthNames = [
   "Janeiro",
@@ -66,13 +162,6 @@ function renderFatal(message) {
 }
 
 const pad = (value) => String(value).padStart(2, "0");
-const getDefaultDateKey = () => {
-  const now = new Date();
-  if (now.getFullYear() === YEAR) {
-    return `${YEAR}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-  }
-  return `${YEAR}-01-01`;
-};
 const dateKeyFor = (month, day) => `${YEAR}-${pad(month + 1)}-${pad(day)}`;
 const getDaysInMonth = (month) => new Date(YEAR, month + 1, 0).getDate();
 const getFirstDayOfWeek = (month) => new Date(YEAR, month, 1).getDay();
@@ -84,10 +173,6 @@ const totalReadings = Object.values(readingPlan).reduce(
 
 let currentMonth = new Date().getFullYear() === YEAR ? new Date().getMonth() : 0;
 let completedSet = new Set();
-
-// Header nav: make "Diario" land on a valid day (otherwise note.html may not have a day param).
-const diaryNavLink = document.querySelector('.nav-actions a[href="note.html"]');
-if (diaryNavLink) diaryNavLink.href = `note.html?day=${getDefaultDateKey()}`;
 
 // Header nav: logout (Supabase signOut + redirect to index.html).
 document.querySelectorAll(".logout-btn").forEach((btn) => {
@@ -230,6 +315,13 @@ function buildDayCell(day, dateKey, reading, isCompleted) {
   }
 
   cell.addEventListener("click", () => {
+    const route = getBibleRouteForReading(reading, dateKey);
+    if (route) {
+      window.location.href = route;
+      return;
+    }
+
+    // Fallback: dias sem leitura (ou leitura desconhecida) continuam abrindo o diário do dia.
     window.location.href = `note.html?day=${dateKey}`;
   });
 

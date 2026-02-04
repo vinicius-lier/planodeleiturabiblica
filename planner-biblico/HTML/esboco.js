@@ -1,36 +1,20 @@
-﻿import { supabase } from "../js/supabase.js";
+import { supabase } from "../js/supabase.js";
 import { requireAuth, signOut } from "../js/auth.js";
 
-const user = await requireAuth();
-if (!user) {
-  throw new Error("No session");
-}
+let user = null;
 
-const YEAR = 2026;
-const pad = (value) => String(value).padStart(2, "0");
-const getDefaultDateKey = () => {
-  const now = new Date();
-  if (now.getFullYear() === YEAR) {
-    return `${YEAR}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-  }
-  return `${YEAR}-01-01`;
-};
-
-// Header nav: make "Diario" land on a valid day.
-const diaryNavLink = document.querySelector('.nav-actions a[href="note.html"]');
-if (diaryNavLink) diaryNavLink.href = `note.html?day=${getDefaultDateKey()}`;
-
-// Header nav: logout (Supabase signOut + redirect to index.html).
-document.querySelectorAll(".logout-btn").forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error(error);
-      window.location.href = "index.html";
-    }
+function wireLogout() {
+  document.querySelectorAll(".logout-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      try {
+        await signOut();
+      } catch (error) {
+        console.error(error);
+        window.location.href = "index.html";
+      }
+    });
   });
-});
+}
 
 const metaInputs = document.querySelectorAll(".esboco-meta input");
 const titleEl = metaInputs[0] || null;
@@ -178,55 +162,53 @@ async function loadOutline(id) {
   if (conclusionEl) conclusionEl.value = row.conclusion || "";
 }
 
-async function listOutlines() {
-  const { data, error } = await supabase
-    .from("esbocos")
-    .select("id,title,status,updated_at")
-    .eq("user_id", user.id)
-    .order("updated_at", { ascending: false });
-
-  if (error) {
-    console.error(error);
-    return [];
-  }
-
-  return data || [];
-}
-
 async function handleListClick() {
   window.location.href = "esbocos.html";
 }
 
-const inputs = [
-  titleEl,
-  baseTextEl,
-  dateEl,
-  audienceEl,
-  visibilityEl,
-  introEl,
-  developmentEl,
-  applicationsEl,
-  conclusionEl
-].filter(Boolean);
+async function init() {
+  // Header links (safe even before auth resolves).
+  wireLogout();
 
-inputs.forEach((field) => {
-  field.addEventListener("input", scheduleSave);
-  field.addEventListener("change", scheduleSave);
-});
+  try {
+    user = await requireAuth();
+  } catch (error) {
+    console.error("Auth required:", error);
+    return;
+  }
 
-if (saveBtn) {
-  saveBtn.addEventListener("click", async () => {
-    await saveOutline("ready");
+  if (!user) return;
+
+  const inputs = [
+    titleEl,
+    baseTextEl,
+    dateEl,
+    audienceEl,
+    visibilityEl,
+    introEl,
+    developmentEl,
+    applicationsEl,
+    conclusionEl
+  ].filter(Boolean);
+
+  inputs.forEach((field) => {
+    field.addEventListener("input", scheduleSave);
+    field.addEventListener("change", scheduleSave);
   });
+
+  if (saveBtn) {
+    saveBtn.addEventListener("click", async () => {
+      await saveOutline("ready");
+    });
+  }
+
+  if (listBtn) listBtn.addEventListener("click", handleListClick);
+
+  const params = new URLSearchParams(window.location.search);
+  const outlineId = params.get("id");
+  if (outlineId) await loadOutline(outlineId);
 }
 
-if (listBtn) {
-  listBtn.addEventListener("click", handleListClick);
-}
-
-// If we came from the list table, open the requested outline.
-const params = new URLSearchParams(window.location.search);
-const outlineId = params.get("id");
-if (outlineId) {
-  loadOutline(outlineId).catch(console.error);
-}
+init().catch((error) => {
+  console.error(error);
+});

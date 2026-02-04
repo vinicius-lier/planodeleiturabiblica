@@ -1,0 +1,481 @@
+.biblia-page {
+  background: var(--bg-main);
+}
+
+/* Topbar (inspirado no bible.com) */
+.biblia-page .bible-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #fff;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.biblia-page .bible-topbar-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem 0.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.biblia-page .bible-topbar-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.biblia-page .reference {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.15rem;
+  color: var(--primary);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.biblia-page .translation {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.biblia-page .bible-topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.biblia-page .bible-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem 0.75rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  overflow-x: auto;
+}
+
+.biblia-page .top-action {
+  border: 1px solid var(--border-soft);
+  background: #fff;
+  color: var(--text-main);
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.biblia-page .top-action:hover {
+  border-color: rgba(44, 82, 130, 0.35);
+  box-shadow: 0 0 0 2px rgba(44, 82, 130, 0.12);
+}
+
+.biblia-page .top-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.biblia-page .top-action.ghost {
+  background: transparent;
+}
+
+.biblia-page .icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: #fff;
+  cursor: pointer;
+  font-size: 1.3rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  color: var(--text-main);
+}
+
+.biblia-page .icon-btn:hover {
+  border-color: rgba(44, 82, 130, 0.35);
+  box-shadow: 0 0 0 2px rgba(44, 82, 130, 0.12);
+}
+
+.biblia-page .icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Reading */
+.biblia-page .bible-main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.biblia-page .reading {
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 1.2rem 1.1rem;
+  box-shadow: 0 12px 32px rgba(45, 55, 72, 0.08);
+}
+
+.biblia-page .reading .loading {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.biblia-page .chapter-start {
+  float: left;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--primary);
+  margin: 0 0.75rem 0.25rem 0;
+}
+
+.biblia-page .reading-text {
+  font-size: 1.05rem;
+  line-height: 1.9;
+}
+
+.biblia-page .reading-verse {
+  display: inline;
+  border-radius: 10px;
+  padding: 0.12rem 0.18rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.biblia-page .reading-verse:hover {
+  background: rgba(44, 82, 130, 0.08);
+}
+
+.biblia-page .reading-verse.selected {
+  box-shadow: 0 0 0 2px rgba(226, 194, 117, 0.55);
+}
+
+.biblia-page .reading-verse.selected:not(.hl-yellow):not(.hl-green):not(.hl-blue):not(.hl-red) {
+  background: rgba(226, 194, 117, 0.18);
+}
+
+/* Highlights (one active color per verse) */
+.biblia-page .reading-verse.hl-yellow {
+  background: rgba(255, 229, 100, 0.55);
+}
+
+.biblia-page .reading-verse.hl-green {
+  background: rgba(139, 232, 175, 0.45);
+}
+
+.biblia-page .reading-verse.hl-blue {
+  background: rgba(125, 201, 255, 0.42);
+}
+
+.biblia-page .reading-verse.hl-red {
+  background: rgba(255, 156, 156, 0.45);
+}
+
+.biblia-page .reading-verse.hl-yellow:hover,
+.biblia-page .reading-verse.hl-green:hover,
+.biblia-page .reading-verse.hl-blue:hover,
+.biblia-page .reading-verse.hl-red:hover {
+  filter: brightness(0.98);
+}
+
+.biblia-page .verse-num {
+  font-size: 0.75em;
+  vertical-align: super;
+  color: var(--text-muted);
+  margin-right: 0.08rem;
+  font-weight: 700;
+}
+
+/* Pickers (bottom sheet) */
+.biblia-page .picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.biblia-page .picker-overlay[hidden] {
+  display: none !important;
+}
+
+.biblia-page .picker-sheet {
+  width: min(980px, 100%);
+  max-height: 82vh;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+}
+
+.biblia-page .picker-header {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0.85rem;
+}
+
+.biblia-page .picker-header h2 {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.2rem;
+  color: var(--primary);
+}
+
+.biblia-page .book-groups {
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.biblia-page .book-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.biblia-page .book-group-title {
+  margin: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.biblia-page .button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.biblia-page .button-grid {
+  padding: 0.85rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+  gap: 0.55rem;
+}
+
+.biblia-page .chip,
+.biblia-page .chapter-btn {
+  border: 1px solid var(--border-soft);
+  background: #fff;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.biblia-page .chip {
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  font-weight: 700;
+}
+
+.biblia-page .chapter-btn {
+  border-radius: 12px;
+  padding: 0.6rem 0;
+  font-weight: 700;
+}
+
+.biblia-page .chip:hover,
+.biblia-page .chapter-btn:hover {
+  border-color: rgba(44, 82, 130, 0.35);
+  box-shadow: 0 0 0 2px rgba(44, 82, 130, 0.12);
+}
+
+.biblia-page .chip.active,
+.biblia-page .chapter-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* Context menu (verse actions) */
+.biblia-page .context-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0.95rem;
+}
+
+.biblia-page .context-overlay[hidden] {
+  display: none !important;
+}
+
+.biblia-page .context-sheet {
+  width: min(760px, 100%);
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+}
+
+.biblia-page .context-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0.95rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.biblia-page .context-title {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.biblia-page .context-ref {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.1rem;
+  color: var(--primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.biblia-page .context-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.biblia-page .context-body {
+  padding: 0.95rem;
+  padding-bottom: calc(0.95rem + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.biblia-page .context-status {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+  min-height: 1rem;
+}
+
+.biblia-page .context-status[data-variant="success"] {
+  color: var(--success);
+}
+
+.biblia-page .context-status[data-variant="error"] {
+  color: var(--error);
+}
+
+.biblia-page .context-status[data-variant="pending"] {
+  color: #d97706;
+}
+
+.biblia-page .context-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.biblia-page .color-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.biblia-page .color-chip {
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: 0.55rem 0.85rem;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 800;
+  transition: all 0.15s ease;
+}
+
+.biblia-page .color-chip:hover {
+  border-color: rgba(44, 82, 130, 0.35);
+  box-shadow: 0 0 0 2px rgba(44, 82, 130, 0.12);
+}
+
+.biblia-page .color-chip.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(44, 82, 130, 0.16);
+}
+
+.biblia-page .color-chip[data-color="yellow"] {
+  background: rgba(255, 229, 100, 0.35);
+}
+
+.biblia-page .color-chip[data-color="green"] {
+  background: rgba(139, 232, 175, 0.28);
+}
+
+.biblia-page .color-chip[data-color="blue"] {
+  background: rgba(125, 201, 255, 0.28);
+}
+
+.biblia-page .color-chip[data-color="red"] {
+  background: rgba(255, 156, 156, 0.28);
+}
+
+.biblia-page .context-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.biblia-page .action-pill {
+  border: 1px solid var(--border-soft);
+  background: #fff;
+  color: var(--text-main);
+  border-radius: 14px;
+  padding: 0.75rem 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.biblia-page .action-pill:hover {
+  border-color: rgba(44, 82, 130, 0.35);
+  box-shadow: 0 0 0 2px rgba(44, 82, 130, 0.12);
+}
+
+.biblia-page .action-pill.danger {
+  border-color: rgba(229, 62, 62, 0.35);
+  color: #C53030;
+}
+
+.biblia-page .action-pill.danger:hover {
+  border-color: rgba(229, 62, 62, 0.55);
+  box-shadow: 0 0 0 2px rgba(229, 62, 62, 0.14);
+}

@@ -99,6 +99,72 @@ for delete
 to authenticated
 using (user_id = auth.uid());
 
+-- 2b) HIGHLIGHTS (private per user)
+-- Stores only metadata (book/chapter/verse/color). Never store the Bible text here.
+create table if not exists public.highlights (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  book text not null,
+  chapter integer not null,
+  verse integer not null,
+  color text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint highlights_chapter_positive check (chapter > 0),
+  constraint highlights_verse_positive check (verse > 0),
+  constraint highlights_color_valid check (color in ('yellow', 'green', 'blue', 'red'))
+);
+
+-- Migration safety: if `highlights` already existed without these columns, add them.
+alter table public.highlights add column if not exists created_at timestamptz;
+alter table public.highlights add column if not exists updated_at timestamptz;
+alter table public.highlights alter column created_at set default now();
+alter table public.highlights alter column updated_at set default now();
+update public.highlights set created_at = coalesce(created_at, now()) where created_at is null;
+update public.highlights set updated_at = coalesce(updated_at, now()) where updated_at is null;
+alter table public.highlights alter column created_at set not null;
+alter table public.highlights alter column updated_at set not null;
+
+create unique index if not exists highlights_unique_ref
+on public.highlights (user_id, book, chapter, verse);
+
+create index if not exists highlights_user_book_chapter_idx
+on public.highlights (user_id, book, chapter);
+
+alter table public.highlights enable row level security;
+
+drop policy if exists "highlights_select_own" on public.highlights;
+create policy "highlights_select_own"
+on public.highlights
+for select
+to authenticated
+using (user_id = auth.uid());
+
+drop policy if exists "highlights_insert_own" on public.highlights;
+create policy "highlights_insert_own"
+on public.highlights
+for insert
+to authenticated
+with check (user_id = auth.uid());
+
+drop policy if exists "highlights_update_own" on public.highlights;
+create policy "highlights_update_own"
+on public.highlights
+for update
+to authenticated
+using (user_id = auth.uid())
+with check (user_id = auth.uid());
+
+drop policy if exists "highlights_delete_own" on public.highlights;
+create policy "highlights_delete_own"
+on public.highlights
+for delete
+to authenticated
+using (user_id = auth.uid());
+
+-- If you added columns/policies and PostgREST still complains, reload schema cache:
+-- notify pgrst, 'reload schema';
+
 -- 3) READING PROGRESS (private per user)
 alter table public.reading_progress enable row level security;
 
@@ -162,4 +228,3 @@ on public.esbocos
 for delete
 to authenticated
 using (user_id = auth.uid());
-
